@@ -132,14 +132,3 @@ SET reimb_resolved = CURRENT_TIMESTAMP, reimb_resolver = 3, reimb_status_id = 2
 WHERE reimb_id = 2;
 
 commit;
-
--- reimbursement table select statement
-SELECT  r.reimb_submitted, r.reimb_amount, r.reimb_description, rt.reimb_type,
-    emp.user_first_name, emp.user_last_name, emp.user_email, r.reimb_resolved,
-    man.user_first_name, man.user_last_name, rs.reimb_status FROM ers_reimbursement r
-LEFT JOIN ers_reimbursement_type rt USING (reimb_type_id)
-LEFT JOIN ers_reimbursement_status rs USING (reimb_status_id)
-LEFT JOIN ers_users emp ON (r.reimb_author = emp.ers_users_id)
-LEFT JOIN ers_users man ON (r.reimb_resolver = man.ers_users_id)
-ORDER BY r.reimb_submitted desc;
-

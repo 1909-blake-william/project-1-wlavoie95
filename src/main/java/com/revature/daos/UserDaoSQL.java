@@ -24,7 +24,6 @@ public class UserDaoSQL implements UserDao {
 		String email = rs.getString("user_email");
 		int roleId = rs.getInt("user_role_id");
 		User u = new User(userId, rsUsername, rsPassword, firstName, lastName, email, roleId);
-		System.out.println(u);
 		return u;
 	}
 
@@ -42,12 +41,9 @@ public class UserDaoSQL implements UserDao {
 			PreparedStatement ps = c.prepareStatement(sql);
 			ps.setString(1, username);
 			ps.setString(2, password);
-			System.out.println(username);
-			System.out.println(password);
 			ResultSet rs = ps.executeQuery();
 			if (rs.next()) {
 				User u = extractUser(rs);
-				System.out.println(u);
 				return u;
 			} else {
 				return null;

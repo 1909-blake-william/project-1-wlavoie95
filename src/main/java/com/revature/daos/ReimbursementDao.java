@@ -12,11 +12,9 @@ public interface ReimbursementDao {
 	
 	List<Reimbursement> findAll();
 	
-	List<Reimbursement> getByStatusId(int statusId);
-	
-	List<Reimbursement> viewUserTickets(int userId);
-	
-	int updateStatus(int reimbursementId, int statusId, int resolverId);
+	int updateStatus(int reimbursementId, String statusType, int resolverId);
 
 	List<Reimbursement> findByUsername(String username);
+
+	List<Reimbursement> findByStatus(String statusType);
 }

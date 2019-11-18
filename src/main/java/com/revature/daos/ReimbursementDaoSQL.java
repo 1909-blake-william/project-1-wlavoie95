@@ -19,25 +19,40 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
 
 	private Reimbursement extractReimbursement(ResultSet rs) throws SQLException {
 		int ticketId = rs.getInt("reimb_id");
-		double amount = rs.getDouble("reimb_amount");
+		int authorId = rs.getInt("ers_users_id");
+		int typeId = rs.getInt("reimb_type_id");
 		Timestamp submitted = rs.getTimestamp("reimb_submitted");
+		double amount = rs.getDouble("reimb_amount");
 		String description = rs.getString("reimb_description");
-		int authorId = rs.getInt("reimb_author");
-		int statusId = rs.getInt("reimb_status_id");
-
+		String ticketType = rs.getString("reimb_type");
+		String authorFirstName = rs.getString("user_first_name");
+		String authorLastName = rs.getString("user_last_name");
+		String authorEmail = rs.getString("user_email");
 		Timestamp resolved = null; // nullable value in DB
-		int resolverId = 0; // nullable value in DB, 0 = unresolved
-
-		if (statusId != 1) { // if the ticket is not pending, then there will be a resolver id and resolver
-								// timestamp
+		int resolverId = 0;
+		String resolverFirstName = ""; // nullable value in DB
+		String resolverLastName = "";
+		String resolverEmail = "";
+		
+		if (rs.getTimestamp("reimb_resolved") != null) {
 			resolved = rs.getTimestamp("reimb_resolved");
 			resolverId = rs.getInt("reimb_resolver");
+			resolverFirstName = rs.getString(13);
+			resolverLastName = rs.getString(14);
+			resolverEmail = rs.getString(15);
 		}
+		String statusType = rs.getString("reimb_status");
 
-		int typeId = rs.getInt("reimb_type_id");
+		
 
-		return new Reimbursement(ticketId, amount, submitted, resolved, description, authorId, resolverId, statusId,
-				typeId);
+//		if (!"Pending".equals(statusType)) { // if the ticket is not pending, then there will be a resolver and a
+//												// resolver timestamp
+//			
+//		}
+
+		return new Reimbursement(ticketId, authorId, typeId, submitted, amount, description, ticketType,
+				authorFirstName, authorLastName, authorEmail, resolved, resolverId, resolverFirstName, resolverLastName,
+				resolverEmail, statusType);
 	}
 
 	@Override
@@ -63,25 +78,65 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
 
 		SQLException e) {
 			// TODO Auto-generated catch block
-//		e.printStackTrace();
+			e.printStackTrace();
 			return 0;
 		}
 	}
 
 	@Override
+	public List<Reimbursement> findByStatus(String statusType) {
+		log.debug("attempting to show all reiumbursement tickets from DB");
+		try (Connection c = ConnectionUtil.getConnection()) {
+
+			String sql = "SELECT  r.reimb_id, emp.ers_users_id, rt.reimb_type_id, r.reimb_submitted, r.reimb_amount, r.reimb_description, "
+					+ "rt.reimb_type, emp.user_first_name, emp.user_last_name, emp.user_email, r.reimb_resolved, r.reimb_resolver, "
+					+ "man.user_first_name AS resolver_first_name, man.user_last_name AS resolver_last_name, man.user_email AS resolver_email, "
+					+ "rs.reimb_status FROM ers_reimbursement r "
+					+ "LEFT JOIN ers_reimbursement_type rt ON (r.reimb_type_id = rt.reimb_type_id) "
+					+ "LEFT JOIN ers_reimbursement_status rs USING (reimb_status_id) "
+					+ "LEFT JOIN ers_users emp ON (r.reimb_author = emp.ers_users_id) "
+					+ "LEFT JOIN ers_users man ON (r.reimb_resolver = man.ers_users_id) "
+					+ "WHERE reimb_status = ? " + "ORDER BY r.reimb_submitted desc";
+
+			PreparedStatement ps = c.prepareStatement(sql);
+			System.out.println(statusType);
+			ps.setString(1, statusType);
+			ResultSet rs = ps.executeQuery();
+			List<Reimbursement> reimbursements = new ArrayList<Reimbursement>();
+			while (rs.next()) {
+				reimbursements.add(extractReimbursement(rs));
+			}
+			return reimbursements;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
+		}
+	}
+	
+	@Override
 	public List<Reimbursement> findAll() {
 		log.debug("attempting to show all reiumbursement tickets from DB");
 		try (Connection c = ConnectionUtil.getConnection()) {
 
-			String sql = "SELECT * FROM ers_reimbursement";
+			String sql = "SELECT  r.reimb_id, emp.ers_users_id, rt.reimb_type_id, r.reimb_submitted, r.reimb_amount, r.reimb_description, "
+					+ "rt.reimb_type, emp.user_first_name, emp.user_last_name, emp.user_email, r.reimb_resolved, r.reimb_resolver, "
+					+ "man.user_first_name AS resolver_first_name, man.user_last_name AS resolver_last_name, man.user_email AS resolver_email, "
+					+ "rs.reimb_status FROM ers_reimbursement r "
+					+ "LEFT JOIN ers_reimbursement_type rt ON (r.reimb_type_id = rt.reimb_type_id) "
+					+ "LEFT JOIN ers_reimbursement_status rs USING (reimb_status_id) "
+					+ "LEFT JOIN ers_users emp ON (r.reimb_author = emp.ers_users_id) "
+					+ "LEFT JOIN ers_users man ON (r.reimb_resolver = man.ers_users_id) "
+					+ "ORDER BY r.reimb_submitted desc";
 
 			PreparedStatement ps = c.prepareStatement(sql);
-
+			
 			ResultSet rs = ps.executeQuery();
 			List<Reimbursement> reimbursements = new ArrayList<Reimbursement>();
 			while (rs.next()) {
 				reimbursements.add(extractReimbursement(rs));
 			}
+			System.out.println(reimbursements);
 			return reimbursements;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
@@ -90,69 +145,32 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
 		}
 	}
 
-	@Override
-	public List<Reimbursement> getByStatusId(int statusId) {
-		log.debug("attempting to show all reiumbursement tickets with selected status from DB");
-		try (Connection c = ConnectionUtil.getConnection()) {
-
-			String sql = "SELECT * FROM ers_reimbursement " + "WHERE reimb_status_id = ?";
-
-			PreparedStatement ps = c.prepareStatement(sql);
-			ps.setInt(1, statusId);
-
-			ResultSet rs = ps.executeQuery();
-
-			List<Reimbursement> reimbursements = new ArrayList<Reimbursement>();
-			while (rs.next()) {
-				reimbursements.add(extractReimbursement(rs));
-			}
-			return reimbursements;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-	}
 
 	@Override
-	public List<Reimbursement> viewUserTickets(int userId) {
-		log.debug("attempting to show all reiumbursement tickets submitted by selected user from DB");
-		try (Connection c = ConnectionUtil.getConnection()) {
-
-			String sql = "SELECT * FROM ers_reimbursement " + "WHERE reimb_author = ?";
-
-			PreparedStatement ps = c.prepareStatement(sql);
-			ps.setInt(1, userId);
-
-			ResultSet rs = ps.executeQuery();
-
-			List<Reimbursement> reimbursements = new ArrayList<Reimbursement>();
-			while (rs.next()) {
-				reimbursements.add(extractReimbursement(rs));
-			}
-			return reimbursements;
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-			return null;
-		}
-	}
-
-	@Override
-	public int updateStatus(int reimbursementId, int statusId, int resolverId) {
+	public int updateStatus(int reimbursementId, String statusType, int resolverId) {
 		log.debug("attempting to update a reimbursement ticket in the DB");
 		try (Connection c = ConnectionUtil.getConnection()) {
-			String sql = "UPDATE ers_reimbursement " + "SET  reimb_resolved = ?, reimb_resolver = ?, reimb_status_id = ? "
-					+ "WHERE reimb_id = ?";
-			
+			String sql = "UPDATE ers_reimbursement "
+					+ "SET  reimb_resolved = ?, reimb_resolver = ?, reimb_status_id = ? " + "WHERE reimb_id = ?";
+
+			int status= 0;
+			if(statusType.equals("Approved")) {
+				status = 2;
+			} else {
+				status = 3;
+			}
+				
 			PreparedStatement ps = c.prepareStatement(sql);
 			ps.setTimestamp(1, new Timestamp(System.currentTimeMillis()));
 			ps.setInt(2, resolverId);
-			ps.setInt(3, statusId);
+			ps.setInt(3, status);
 			ps.setInt(4, reimbursementId);
-			
+
+			System.out.println(resolverId);
+			System.out.println(status);
+			System.out.println(reimbursementId);
 			return ps.executeUpdate();
-			
+
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
@@ -165,16 +183,25 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
 		log.debug("attempting to show all reiumbursement tickets from DB");
 		try (Connection c = ConnectionUtil.getConnection()) {
 
-			String sql = "SELECT * FROM ers_reimbursement " + "WHERE username = ?";
+			String sql = "SELECT  r.reimb_id, emp.ers_users_id, rt.reimb_type_id, r.reimb_submitted, r.reimb_amount, r.reimb_description, "
+					+ "rt.reimb_type, emp.user_first_name, emp.user_last_name, emp.user_email, r.reimb_resolved, r.reimb_resolver, "
+					+ "man.user_first_name AS resolver_first_name, man.user_last_name AS resolver_last_name, man.user_email AS resolver_email, "
+					+ "rs.reimb_status FROM ers_reimbursement r "
+					+ "LEFT JOIN ers_reimbursement_type rt ON (r.reimb_type_id = rt.reimb_type_id) "
+					+ "LEFT JOIN ers_reimbursement_status rs USING (reimb_status_id) "
+					+ "LEFT JOIN ers_users emp ON (r.reimb_author = emp.ers_users_id) "
+					+ "LEFT JOIN ers_users man ON (r.reimb_resolver = man.ers_users_id) "
+					+ "WHERE emp.ers_username = ? " + "ORDER BY r.reimb_submitted desc";
 
 			PreparedStatement ps = c.prepareStatement(sql);
 			ps.setString(1, username);
-			
+
 			ResultSet rs = ps.executeQuery();
 			List<Reimbursement> reimbursements = new ArrayList<Reimbursement>();
 			while (rs.next()) {
 				reimbursements.add(extractReimbursement(rs));
 			}
+			System.out.println(reimbursements);
 			return reimbursements;
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block

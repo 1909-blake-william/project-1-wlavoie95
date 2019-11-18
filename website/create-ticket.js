@@ -1,14 +1,12 @@
-function login(event) {
+
+function postTicket(event) {
     event.preventDefault();
 
-    const username = document.getElementById('inputUsername').value;
-    const password = document.getElementById('inputPassword').value;
-    const user = {
-        username,
-        password,
-    };
-    console.log(user);
-    fetch('http://localhost:8080/Project1/auth/login', {
+    const amount = document.getElementById('inputAmount').value;
+    const reimbType = document.getElementById('inputReimbType').value;
+    const 
+    const user = getCurrentUserInfo();
+    fetch(`http://localhost:8080/Project1/reimbursements/employee/ticket`, {
         method: 'POST',
         headers: {
             'content-type': 'application/json'
@@ -31,9 +29,4 @@ function login(event) {
             }
         })
         .catch(err => console.log(err));
-}
-
-function logout() {
-    currentUser = undefined;
-    window.location = 'login.html'
 }

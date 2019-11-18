@@ -6,6 +6,12 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <meta http-equiv="X-UA-Compatible" content="ie=edge">
   <title>ERS System</title>
+
+  <link rel="stylesheet" href="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/css/bootstrap.min.css"
+    integrity="sha384-ggOyR0iXCbMQv3Xipma34MD+dH/1fQ784/j6cY/iJTQUOhcWr7x9JvoRxT2MZw1T" crossorigin="anonymous">
+
+  <!-- bootstrap -->
+  <link rel="stylesheet" href="styles.css">
 </head>
 
 <body>
@@ -18,27 +24,44 @@
     <div class="collapse navbar-collapse" id="navbarSupportedContent">
       <ul class="navbar-nav mr-auto">
         <li class="nav-item">
-          <a class="nav-link" onclick="logout()">Logout</a> <!-- need to make this one hide when logged out-->
+          <a class="nav-link" onclick="logout()">Logout</a>
         </li>
         <li class="nav-item dropdown">
-          <a class="nav-link dropdown-toggle" href="#" id="navbarDropdown" role="button" data-toggle="dropdown"
+          <a class="nav-link dropdown-toggle" id="navbarDropdown" role="button" data-toggle="dropdown"
             aria-haspopup="true" aria-expanded="false">
             Reimbursements
           </a>
           <div class="dropdown-menu" aria-labelledby="navbarDropdown">
             <a class="dropdown-item" onclick="view('')">View All</a>
             <a class="dropdown-item" onclick="view('Pending')">View Pending</a>
-            <a class="nav-link" onclick="view('Accepted')">View Accepted</a>
+            <a class="dropdown-item" onclick="view('Approved')">View Approved</a>
             <a class="dropdown-item" onclick="view('Denied')">View Denied</a>
           </div>
-        </li>
-        <li class="nav-item">
-          <a class="nav-link disabled" href="#" tabindex="-1" aria-disabled="true">Disabled</a>
-        </li>
       </ul>
       <form class="form-inline my-2 my-lg-0" id="nav-username"> Not Logged In</form>
     </div>
   </nav>
+
+  <div>
+    <table id="reimbursement-table">
+      <thread>
+        <th scope="col">Time Submitted</th>
+        <th scope="col">Amount</th>
+        <th scope="col">Description</th>
+        <th scope="col">Type</th>
+        <th scope="col">Author</th>
+        <th scope="col">Author Email</th>
+        <th scope="col">Time Resolved</th>
+        <th scope="col">Resolver</th>
+        <th scope="col">Resolver Email</th>
+        <th scope="col">Status</th>
+        <th id="buttons" scope="col">Manage</th>
+      </thread>
+
+      <tbody id="reimbursement-table-body">
+      </tbody>
+    </table>
+  </div>
 
 </body>
 <script src="https://code.jquery.com/jquery-3.3.1.slim.min.js"
@@ -48,7 +71,8 @@
 <script src="https://stackpath.bootstrapcdn.com/bootstrap/4.3.1/js/bootstrap.min.js"
   integrity="sha384-JjSmVgyd0p3pXB1rRibZUAYoIIy6OrQ6VrjIEaFf/nJGzIxFDsf4x0xIM+B07jRM" crossorigin="anonymous"></script>
 
-<script src="table-functions.js"></script>
-<script src="reimbursement.js"></script>
+<script src="user-functions.js"></script>
+<script src="employee.js"></script>
+<script src="login.js"></script>
 
 </html>
