@@ -99,7 +99,7 @@ function addReimbursementsToTable(reimbursement) {
         const rStatus = document.createElement('td');
         rStatus.innerText = reimbursement.statusType;
         row.appendChild(rStatus);
-        if (currentUser.id === 2) {
+        if (currentUser.role === 2) {
             const manage = document.createElement('td');
             manage.innerHTML = ' ';
             row.appendChild(manage);
@@ -125,7 +125,8 @@ function addReimbursementsToTable(reimbursement) {
         rStatus.innerText = reimbursement.statusType;
         row.appendChild(rStatus);
 
-        if (currentUser.id === 2) {
+        if (currentUser.role === 2) {
+            console.log(currentUser.id)
             const manage = document.createElement('td');
             manage.innerHTML = `<button class="btn btn-lg btn-success btn-block" type="button" onclick="updateTicket('Approved', ${reimbursement.id})">Approve</button>
         <button class="btn btn-lg btn-danger btn-block" type="button" onclick="updateTicket('Denied', ${reimbursement.id})">Deny</button>`;
