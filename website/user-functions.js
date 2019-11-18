@@ -99,11 +99,11 @@ function addReimbursementsToTable(reimbursement) {
         const rStatus = document.createElement('td');
         rStatus.innerText = reimbursement.statusType;
         row.appendChild(rStatus);
-
-        const manage = document.createElement('td');
-        manage.innerHTML = ' ';
-        row.appendChild(manage);
-
+        if (currentUser.id === 2) {
+            const manage = document.createElement('td');
+            manage.innerHTML = ' ';
+            row.appendChild(manage);
+        }
     } else {
 
         const timeResolved = document.createElement('td');
@@ -125,10 +125,12 @@ function addReimbursementsToTable(reimbursement) {
         rStatus.innerText = reimbursement.statusType;
         row.appendChild(rStatus);
 
-        const manage = document.createElement('td');
-        manage.innerHTML = `<button class="btn btn-lg btn-success btn-block" type="button" onclick="updateTicket('Approved', ${reimbursement.id})">Approve</button>
+        if (currentUser.id === 2) {
+            const manage = document.createElement('td');
+            manage.innerHTML = `<button class="btn btn-lg btn-success btn-block" type="button" onclick="updateTicket('Approved', ${reimbursement.id})">Approve</button>
         <button class="btn btn-lg btn-danger btn-block" type="button" onclick="updateTicket('Denied', ${reimbursement.id})">Deny</button>`;
-        row.appendChild(manage);
+            row.appendChild(manage);
+        }
     }
 
     // append the row into the table
@@ -226,19 +228,19 @@ function updateTicket(status, id) {
         .catch(err => {
             window.location = 'login.html';
         })
-    }
+}
 
-    function createTicket(event){
-        event.preventDefault();
+function createTicket(event) {
+    event.preventDefault();
 
     const amount = document.getElementById('amount').value;
     const reimbType = document.getElementById('expense-type').value;
     let typeId;
-    if(reimbType === 'Lodging'){
+    if (reimbType === 'Lodging') {
         typeId = 1;
-    } else if (reimbType === 'Food'){
+    } else if (reimbType === 'Food') {
         typeId = 2;
-    } else if (reimbType === 'Travel'){
+    } else if (reimbType === 'Travel') {
         typeId = 3;
     } else {
         typeId = 4;
