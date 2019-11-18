@@ -26,7 +26,17 @@ public class Reimbursement {
 		super();
 		// TODO Auto-generated constructor stub
 	}
-		
+	
+	public Reimbursement(double amount, String description, int authorId, int typeId) {
+		super();
+		this.id = 0;
+		this.submitted = null;
+		this.amount = amount;
+		this.authorId = authorId;
+		this.typeId = typeId;
+		this.description = description;
+	}
+	
 	public Reimbursement(int id, int authorId, int typeId, Timestamp submitted, double amount, String description,
 			String ticketType, String authorFirstName, String authorLastName, String authorEmail, Timestamp resolved,
 			int resolverId, String resolverFirstName, String resolverLastName, String resolverEmail,

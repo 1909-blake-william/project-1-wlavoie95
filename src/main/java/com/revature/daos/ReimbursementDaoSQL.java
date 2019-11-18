@@ -70,6 +70,10 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
 			ps.setString(3, r.getDescription());
 			ps.setInt(4, r.getAuthorId());
 			ps.setInt(5, r.getTypeId());
+			System.out.println(r.getAmount());
+			System.out.println(new Timestamp(System.currentTimeMillis()));
+			System.out.println(r.getDescription());
+			System.out.println(r.getTypeId());
 
 			return ps.executeUpdate();
 		}

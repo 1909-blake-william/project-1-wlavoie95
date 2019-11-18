@@ -123,6 +123,7 @@ INSERT INTO ers_reimbursement(reimb_id, reimb_amount, reimb_submitted, reimb_des
 INSERT INTO ers_reimbursement(reimb_id, reimb_amount, reimb_submitted, reimb_description, reimb_author, reimb_type_id)
     VALUES(ERS_REIMBURSEMENT_ID_SEQ.nextval, 10, CURRENT_TIMESTAMP, 'Food from the trolley', 5, 3);
 
+
 UPDATE ers_reimbursement
 SET reimb_resolved = CURRENT_TIMESTAMP, reimb_resolver = 2, reimb_status_id = 3
 WHERE reimb_id = 1;

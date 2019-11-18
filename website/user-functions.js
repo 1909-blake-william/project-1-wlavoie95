@@ -233,14 +233,24 @@ function updateTicket(status, id) {
 
     const amount = document.getElementById('amount').value;
     const reimbType = document.getElementById('expense-type').value;
+    let typeId;
+    if(reimbType === 'Lodging'){
+        typeId = 1;
+    } else if (reimbType === 'Food'){
+        typeId = 2;
+    } else if (reimbType === 'Travel'){
+        typeId = 3;
+    } else {
+        typeId = 4;
+    }
     const description = document.getElementById('description').value;
     ticket = {
         amount: amount,
-        reimb_type: reimbType,
+        typeId: typeId,
         description: description,
-        user: currentUser.id,
+        authorId: currentUser.id,
     }
-    fetch('/Project1/reimbursements/employee/create-ticket', {
+    fetch('http://localhost:8080/Project1/reimbursements/employee/create-ticket', {
         method: 'POST',
         headers: {
             'content-type': 'application/json'
@@ -248,19 +258,9 @@ function updateTicket(status, id) {
         credentials: 'include', // put credentials: 'include' on every request to use session info
         body: JSON.stringify(ticket)
     })
-        .then(resp => resp.json())
+        //.then(resp => resp.json())
         .then(data => {
-            // redirect
-            if (data.role === 2) {
-                console.log('navigate to manager');
-                window.location = 'manager.html';
-            }
-            else if (data.role === 1) {
-                console.log('navigate to employee');
-                window.location = 'employee.html';
-            } else {
-                document.getElementById('error-message').innerText = 'Failed to login';
-            }
+            console.log('success!');
         })
         .catch(err => console.log(err));
 }

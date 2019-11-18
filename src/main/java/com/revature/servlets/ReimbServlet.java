@@ -69,21 +69,23 @@ public class ReimbServlet extends HttpServlet {
 
 	@Override
 	protected void doPost(HttpServletRequest req, HttpServletResponse resp) throws ServletException, IOException {
-		if ("/Project1/reimbursements/employee/create-ticket".equals(req.getRequestURI())) {
-
-		}
-		// read the reimbursement from the request body
 		ObjectMapper om = new ObjectMapper();
 		Reimbursement r = (Reimbursement) om.readValue(req.getReader(), Reimbursement.class);
-		System.out.println(r);
-		if (r == null) {
+		if ("/Project1/reimbursements/employee/create-ticket".equals(req.getRequestURI())) {
 
+			// read the reimbursement from the request body
+			
+			System.out.println(r);
+			if (r != null) {
+				int id = reimbursementDao.save(r);
+				r.setId(id);
+				resp.setStatus(201); // created status code
+			} else {
+				resp.setStatus(401);
+			}
+		
+			
 		}
-		int id = reimbursementDao.save(r);
-		r.setId(id);
-
-		resp.setStatus(201); // created status code
-
 		resp.getWriter().write(om.writeValueAsString(r));
 
 	}
@@ -94,8 +96,7 @@ public class ReimbServlet extends HttpServlet {
 		Reimbursement r = (Reimbursement) om.readValue(req.getReader(), Reimbursement.class);
 		System.out.println("uri = " + req.getRequestURI());
 		if ("/Project1/reimbursements/manager/update-ticket".equals(req.getRequestURI())) {
-			
-			
+
 			reimbursementDao.updateStatus(r.getId(), r.getStatusType(), r.getResolverId());
 			resp.setStatus(201); // created status code
 		} else {
