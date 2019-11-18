@@ -20,40 +20,41 @@ Tables and sequences
 
 CREATE SEQUENCE ers_reimb_status_id_seq;
 CREATE TABLE ers_reimbursement_status(
-    reimb_status_id NUMBER PRIMARY KEY,
+    reimb_status_id NUMBER PRIMARY KEY NOT NULL,
     reimb_status VARCHAR2(10) DEFAULT 'Pending' NOT NULL
 );
 
 CREATE SEQUENCE ers_reimb_type_id_seq;
 CREATE TABLE ers_reimbursement_type(
-    reimb_type_id NUMBER PRIMARY KEY,
+    reimb_type_id NUMBER PRIMARY KEY NOT NULL,
     reimb_type VARCHAR2(10) NOT NULL
 );
 
 CREATE SEQUENCE ers_user_roles_id_seq;
 CREATE TABLE ers_user_roles(
-    ers_user_role_id NUMBER PRIMARY KEY,
+    ers_user_role_id NUMBER PRIMARY KEY NOT NULL,
     user_role VARCHAR2(10) NOT NULL
 );
 
 CREATE SEQUENCE ers_user_id_seq;
 CREATE TABLE ers_users(
-    ers_users_id NUMBER PRIMARY KEY,
+    ers_users_id NUMBER PRIMARY KEY NOT NULL,
     ers_username VARCHAR2(50) UNIQUE NOT NULL,
     ers_password VARCHAR2(50) NOT NULL,
     user_first_name VARCHAR2(100) NOT NULL,
     user_last_name VARCHAR2(100) NOT NULL,
     user_email VARCHAR2(150) UNIQUE NOT NULL,
-    user_role_id NUMBER REFERENCES ers_user_roles(ers_user_role_id)
+    user_role_id NUMBER REFERENCES ers_user_roles(ers_user_role_id) NOT NULL
 );
 
 CREATE SEQUENCE ers_reimbursement_id_seq;
 CREATE TABLE ers_reimbursement (
-    reimb_id NUMBER PRIMARY KEY,
+    reimb_id NUMBER PRIMARY KEY NOT NULL,
     reimb_amount NUMBER NOT NULL,
     reimb_submitted TIMESTAMP NOT NULL,
     reimb_resolved TIMESTAMP,
     reimb_description VARCHAR(250),
+    reimb_receipt BLOB,
     reimb_author NUMBER REFERENCES ers_users(ers_users_id) NOT NULL,
     reimb_resolver NUMBER REFERENCES ers_users(ers_users_id),
     -- status id defaults to id 1, which is the "Pending" status
@@ -132,4 +133,13 @@ WHERE reimb_id = 2;
 
 commit;
 
+-- reimbursement table select statement
+SELECT  r.reimb_submitted, r.reimb_amount, r.reimb_description, rt.reimb_type,
+    emp.user_first_name, emp.user_last_name, emp.user_email, r.reimb_resolved,
+    man.user_first_name, man.user_last_name, rs.reimb_status FROM ers_reimbursement r
+LEFT JOIN ers_reimbursement_type rt USING (reimb_type_id)
+LEFT JOIN ers_reimbursement_status rs USING (reimb_status_id)
+LEFT JOIN ers_users emp ON (r.reimb_author = emp.ers_users_id)
+LEFT JOIN ers_users man ON (r.reimb_resolver = man.ers_users_id)
+ORDER BY r.reimb_submitted desc;
 

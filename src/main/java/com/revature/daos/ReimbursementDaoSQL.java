@@ -69,7 +69,7 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
 	}
 
 	@Override
-	public List<Reimbursement> showAllReimbursements() {
+	public List<Reimbursement> findAll() {
 		log.debug("attempting to show all reiumbursement tickets from DB");
 		try (Connection c = ConnectionUtil.getConnection()) {
 
@@ -140,7 +140,7 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
 
 	@Override
 	public int updateStatus(int reimbursementId, int statusId, int resolverId) {
-		log.debug("attempting to show all reiumbursement tickets submitted by selected user from DB");
+		log.debug("attempting to update a reimbursement ticket in the DB");
 		try (Connection c = ConnectionUtil.getConnection()) {
 			String sql = "UPDATE ers_reimbursement " + "SET  reimb_resolved = ?, reimb_resolver = ?, reimb_status_id = ? "
 					+ "WHERE reimb_id = ?";
@@ -157,6 +157,29 @@ public class ReimbursementDaoSQL implements ReimbursementDao {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 			return 0;
+		}
+	}
+
+	@Override
+	public List<Reimbursement> findByUsername(String username) {
+		log.debug("attempting to show all reiumbursement tickets from DB");
+		try (Connection c = ConnectionUtil.getConnection()) {
+
+			String sql = "SELECT * FROM ers_reimbursement " + "WHERE username = ?";
+
+			PreparedStatement ps = c.prepareStatement(sql);
+			ps.setString(1, username);
+			
+			ResultSet rs = ps.executeQuery();
+			List<Reimbursement> reimbursements = new ArrayList<Reimbursement>();
+			while (rs.next()) {
+				reimbursements.add(extractReimbursement(rs));
+			}
+			return reimbursements;
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+			return null;
 		}
 	}
 

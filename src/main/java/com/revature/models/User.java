@@ -1,23 +1,13 @@
 package com.revature.models;
 
-import java.io.Serializable;
-
-import com.fasterxml.jackson.annotation.JsonProperty;
-
-public class User implements Serializable {
+public class User {
 	private int id;
 	private String username;
+	private String password;
 	private String firstName;
 	private String lastName;
 	private String email;
-	private String role; // will get role from SQL call to roles table
-	
-
-	// allow jackson to convert passwords in json to the java object
-	// but don't allow it to convert the password in object to json
-	@JsonProperty(access = JsonProperty.Access.WRITE_ONLY)
-	private String password;
-
+	private int role; // will get role from SQL call to roles table
 
 	public User() {
 		super();
@@ -25,7 +15,7 @@ public class User implements Serializable {
 	}
 
 
-	public User(int id, String username, String password, String firstName, String lastName, String email, String role) {
+	public User(int id, String username, String password, String firstName, String lastName, String email, int role) {
 		super();
 		this.id = id;
 		this.username = username;
@@ -87,12 +77,12 @@ public class User implements Serializable {
 	}
 
 
-	public String getRole() {
+	public int getRole() {
 		return role;
 	}
 
 
-	public void setRole(String role) {
+	public void setRole(int role) {
 		this.role = role;
 	}
 
@@ -106,7 +96,6 @@ public class User implements Serializable {
 		this.password = password;
 	}
 
-
 	@Override
 	public int hashCode() {
 		final int prime = 31;
@@ -116,7 +105,7 @@ public class User implements Serializable {
 		result = prime * result + id;
 		result = prime * result + ((lastName == null) ? 0 : lastName.hashCode());
 		result = prime * result + ((password == null) ? 0 : password.hashCode());
-		result = prime * result + ((role == null) ? 0 : role.hashCode());
+		result = prime * result + role;
 		result = prime * result + ((username == null) ? 0 : username.hashCode());
 		return result;
 	}
@@ -153,10 +142,7 @@ public class User implements Serializable {
 				return false;
 		} else if (!password.equals(other.password))
 			return false;
-		if (role == null) {
-			if (other.role != null)
-				return false;
-		} else if (!role.equals(other.role))
+		if (role != other.role)
 			return false;
 		if (username == null) {
 			if (other.username != null)
@@ -169,9 +155,12 @@ public class User implements Serializable {
 
 	@Override
 	public String toString() {
-		return "User [id=" + id + ", username=" + username + ", firstName=" + firstName + ", lastName=" + lastName
-				+ ", email=" + email + ", role=" + role + "]";
+		return "User [id=" + id + ", username=" + username + ", password=" + password + ", firstName=" + firstName
+				+ ", lastName=" + lastName + ", email=" + email + ", role=" + role + "]";
 	}
+
+
+	
 	
 	
 }

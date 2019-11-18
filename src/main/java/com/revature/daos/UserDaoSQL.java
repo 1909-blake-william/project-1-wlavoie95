@@ -12,25 +12,20 @@ import com.revature.models.User;
 import com.revature.util.ConnectionUtil;
 
 public class UserDaoSQL implements UserDao {
-
+	private UserDao userDao = UserDao.currentImplementation;
 	private Logger log = Logger.getRootLogger();
 
 	private User extractUser(ResultSet rs) throws SQLException {
-		int id = rs.getInt("ers_user_id");
+		int userId = rs.getInt("ers_users_id");
 		String rsUsername = rs.getString("ers_username");
-		// String rsPassword = rs.getString("ers_password");
+		String rsPassword = rs.getString("ers_password");
 		String firstName = rs.getString("user_first_name");
 		String lastName = rs.getString("user_last_name");
 		String email = rs.getString("user_email");
 		int roleId = rs.getInt("user_role_id");
-		String role;
-		if (roleId == 1) {
-			role = "Apprentice";
-		} else {
-			role = "Wizard";
-		}
-		
-		return new User(roleId, rsUsername, "", firstName, lastName, email, role);
+		User u = new User(userId, rsUsername, rsPassword, firstName, lastName, email, roleId);
+		System.out.println(u);
+		return u;
 	}
 
 	/*
@@ -41,23 +36,26 @@ public class UserDaoSQL implements UserDao {
 		log.debug("attempting to find user by credentials from DB");
 		try (Connection c = ConnectionUtil.getConnection()) {
 
-			String sql = "SELECT * FROM pokemon_users " + "WHERE username = ? AND password = ?";
+			String sql = "SELECT * FROM ers_users " + "WHERE ers_username = ? " 
+					+ "AND ers_password = ?";
 
 			PreparedStatement ps = c.prepareStatement(sql);
 			ps.setString(1, username);
 			ps.setString(2, password);
-
+			System.out.println(username);
+			System.out.println(password);
 			ResultSet rs = ps.executeQuery();
-
 			if (rs.next()) {
-				return extractUser(rs);
+				User u = extractUser(rs);
+				System.out.println(u);
+				return u;
 			} else {
 				return null;
 			}
 
 		} catch (SQLException e) {
 			// TODO Auto-generated catch block
-//			e.printStackTrace();
+			e.printStackTrace();
 			return null;
 		}
 
